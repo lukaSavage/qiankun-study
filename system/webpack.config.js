@@ -3,7 +3,7 @@
  * @Author: lukasavage
  * @Date: 2022-07-17 13:39:32
  * @LastEditors: lukasavage
- * @LastEditTime: 2022-07-17 13:57:21
+ * @LastEditTime: 2022-07-17 17:15:56
  * @FilePath: \qiankun-study\system\webpack.config.js
  */
 const path = require('path');
@@ -14,7 +14,7 @@ module.exports = env => {
 		output: {
 			filename: 'index.js',
 			path: path.resolve(__dirname, 'dist'),
-			libaryTarget: env.production ? 'system' : '',
+			libraryTarget: env.production ? 'system' : '', // 打包的格式， system模块
 		},
 		module: {
 			rules: [
@@ -30,7 +30,8 @@ module.exports = env => {
 				new HtmlWebpackPlugin({
 					template: './public/index.html',
 				}),
-		],
+		].filter(Boolean),
+        // externals: 在打包过程中，忽略react、react-dom的打包
 		externals: env.production ? ['react', 'react-dom'] : [],
 	};
 };

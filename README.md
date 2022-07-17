@@ -44,6 +44,7 @@
 - `iframe`、`webComponent`
 - 2018年`Single-spa`诞生了，`Single-spa`是一个用于前端微服务化的`JavaScript`前端解决方案（本身没有处理样式隔离，js执行隔离）实现了路由劫持和应用加载
 - 2019年`qiankun`基于Single-spa，提供了更加开箱即用的`API`(`single-spa`+`sandbox`+`import-html-entry`)做到了技术栈无关、并且介入简单（像`iframe`一样简单）
+- 2020年`EMP`基于module Federation, 接入成本低，解决第三方依赖包的问题。
 
 ```markdown
 总结：子应用可以独立构建，运行时动态加载，主子应用完全解耦，技术栈无关，靠的是协议介入（子应用必须导出bootstrap、mount、unmount方法）
@@ -55,17 +56,19 @@
 
 ## 二、System.js
 
-`SystemJs`是一个通用的模块加载器，它能在浏览器上动态加载模块。微前端的核心就是加载微应用，我们将一个个应用打包成模块，在浏览器汇总通过SystemJs来加载模块。
+`SystemJs`是一个通用的模块加载器，它能在浏览器上动态加载模块。微前端的核心就是加载微应用，我们将一个个应用打包成模块，在浏览器汇总通过SystemJs来加载模块。下文所讲的Single-spa也是用到了System.js进行动态加载模块的。具体用法如下↓↓↓
 
-### 2.1 搭建React开发环境
-
-```bash
-npm init -y
-npm i webpack webpack-cli webpack-dev-server babel-loader @babel/core @babel/preset-env @babel/preset-react html-webpack-plugin -D
-npm i react react-dom
+```html
+<script src="system.js"></script>
+<script>
+	SystemJS.import('./index.js')
+</script>
 ```
 
-  
+  systemJs模块加载的流程↓
+
+1. 先请求获取远程cdn文件模块，systemjs 才有了 直接请求的方式， 然后文件解析后会直接挂载在全局对象上面 window/global 
+2. 遍历全局变量，拿最新插入的属性，这样就能提取
 
 三、Single-Spa实战
 
