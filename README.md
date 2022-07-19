@@ -1,4 +1,4 @@
-# qiankun-demo
+# 微前端
 
 ## 一、介绍
 
@@ -70,11 +70,113 @@
 1. 先请求获取远程cdn文件模块，systemjs 才有了 直接请求的方式， 然后文件解析后会直接挂载在全局对象上面 window/global 
 2. 遍历全局变量，拿最新插入的属性，这样就能提取
 
-三、Single-Spa实战
+## 三、Single-Spa实战
+
+> [single-spa](https://zh-hans.single-spa.js.org/docs/getting-started-overview)是一个将多个单页面应用聚合为一个整体应用的 JavaScript 微前端框架。使用 single-spa 进行前端架构设计可以带来很多好处，例如↓
+>
+> - 在同一页面上[使用多个前端框架](https://zh-hans.single-spa.js.org/docs/ecosystem#help-for-frameworks) [而不用刷新页面](https://zh-hans.single-spa.js.org/docs/building-applications) ([React](https://zh-hans.single-spa.js.org/docs/ecosystem-react), [AngularJS](https://zh-hans.single-spa.js.org/docs/ecosystem-angularjs), [Angular](https://zh-hans.single-spa.js.org/docs/ecosystem-angular), [Ember](https://zh-hans.single-spa.js.org/docs/ecosystem-ember), 你正在使用的框架)
+> - 独立部署每一个单页面应用
+> - 新功能使用新框架，旧的单页应用不用重写可以共存
+> - 改善初始加载时间，延迟加载代码
+
+### 3.1 安装
+
+#### 3.1.1 全局安装single-spa
+
+```bash
+npm i create-single-spa -g
+```
+
+#### 3.1.2 接着安装基座
+
+```bash
+create-single-spa base
+```
+
+#### ![安装基座](imgs/01.png)
+
+#### 3.1.3 创建子应用
+
+生成react子应用
+
+```bash
+create-single-spa react-app
+```
+
+![](imgs/02.png)
+
+生成vue子应用
+
+```bash
+create-single-spa vue-app
+```
+
+![](imgs/03.png)
+
+### 3.2 启动子应用
+
+#### 3.2.1 启动vue
+
+1. 先改写vue.config.js
+
+   ```js
+   const { defineConfig } = require('@vue/cli-service');
+   module.exports = defineConfig({
+   	transpileDependencies: true,
+   +	devServer: {
+   +		port: 3000,
+   +	},
+   });
+   ```
+
+2. 接着在`singleSpa\base\src\lks-root-config.js`下注册子应用
+
+   > 当访问 `/vue` 路径的时候，single-spa便会加载 `System.import('@lks/vue')`
+
+   ```js
+   registerApplication({
+   	name: '@lks-vue', // 应用名字 随便起
+   	app: () => System.import('@lks/vue'), // 当路径匹配到的时候，执行这个方法
+   	activeWhen: ['/vue'],
+   });
+   ```
+
+3. 接着改写`singleSpa\base\src\index.ejs`下的代码
+
+   > 此时`System.import('@lks/vue')`对应的imports为 `"@lks/vue":"//localhost:3000/js/app.js"`
+
+   ```ejs
+   </script>
+       <link rel="preload" href="https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js" as="script">
+   
+       <!-- Add your organization's prod import map URL to this script's src  -->
+       <!-- <script type="systemjs-importmap" src="/importmap.json"></script> -->
+   
+       <% if (isLocal) { %>
+           <script type="systemjs-importmap">
+       {
+         "imports": {
+           "@lks/root-config": "//localhost:9000/lks-root-config.js",
+           "@lks/vue":"//localhost:3000/js/app.js"
+         }
+       }
+     </script>
+   ```
+
+   
+
+4. 
+
+## 五、qiankun实战
+
+## 六、qiankun源码解读
+
+## 七、模块联邦
 
 1. 需要安装的包
 
-   ```
+   ```bash
+   npm i create-single-spa -g
    yarn add single-spa-vue    // 用于实现路由和应用加载，该包可以帮助我们导出单页面子应用
    ```
 
