@@ -56,7 +56,7 @@
 
 ## 二、System.js
 
-`SystemJs`是一个通用的模块加载器，它能在浏览器上动态加载模块。微前端的核心就是加载微应用，我们将一个个应用打包成模块，在浏览器汇总通过SystemJs来加载模块。下文所讲的Single-spa也是用到了System.js进行动态加载模块的。具体用法如下↓↓↓
+`SystemJs`是一个通用的模块加载器，它能在浏览器上动态加载模块。微前端的核心就是加载微应用，我们将一个个应用打包成模块，在浏览器中通过SystemJs来加载模块。下文所讲的Single-spa也是用到了System.js进行动态加载模块的。具体用法如下↓↓↓
 
 ```html
 <script src="system.js"></script>
@@ -69,6 +69,8 @@
 
 1. 先请求获取远程cdn文件模块，systemjs 才有了 直接请求的方式， 然后文件解析后会直接挂载在全局对象上面 window/global 
 2. 遍历全局变量，拿最新插入的属性，这样就能提取
+
+![](imgs/04.png)
 
 ## 三、Single-Spa实战
 
@@ -159,13 +161,11 @@ create-single-spa vue-app
            "@lks/root-config": "//localhost:9000/lks-root-config.js",
            "@lks/vue":"//localhost:3000/js/app.js"
          }
-       }
+      }
      </script>
    ```
 
-   
-
-4. 
+4.  
 
 ## 五、qiankun实战
 

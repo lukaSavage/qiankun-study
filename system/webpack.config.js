@@ -3,7 +3,7 @@
  * @Author: lukasavage
  * @Date: 2022-07-17 13:39:32
  * @LastEditors: lukasavage
- * @LastEditTime: 2022-07-17 17:15:56
+ * @LastEditTime: 2022-07-24 09:49:13
  * @FilePath: \qiankun-study\system\webpack.config.js
  */
 const path = require('path');
@@ -31,7 +31,8 @@ module.exports = env => {
 					template: './public/index.html',
 				}),
 		].filter(Boolean),
-        // externals: 在打包过程中，忽略react、react-dom的打包
+        // externals: 在打包过程中，忽略react、react-dom的打包,使用system动态加载cdn方式引入这两个包
+        // 在微前端中，如果子应用都是react,如果不设置externals,那么重复的react、react-dom两个子应用都会打包，浪费性能
 		externals: env.production ? ['react', 'react-dom'] : [],
 	};
 };

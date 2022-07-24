@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: 
+ * @Author: lukasavage
+ * @Date: 2022-07-21 21:40:46
+ * @LastEditors: lukasavage
+ * @LastEditTime: 2022-07-21 21:52:24
+ * @FilePath: \qiankun-study\singleSpa\vue-app\src\main.js
+ */
 import { h, createApp } from 'vue';
 import singleSpaVue from 'single-spa-vue';
 
@@ -20,6 +28,23 @@ const vueLifecycles = singleSpaVue({
     },
   },
 });
+
+
+// export async function bootstrap() {
+    
+// }
+
+// export async function mount(props) {
+//     console.log('mount', props);
+// }
+
+// export async function unmount(props) {
+//     console.log('unmount', props);
+// }
+
+// export async function update(props) {
+//     console.log('update', props);
+// }
 
 export const bootstrap = vueLifecycles.bootstrap;
 export const mount = vueLifecycles.mount;
