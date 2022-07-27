@@ -1,0 +1,43 @@
+<!--
+ * @Descripttion: 
+ * @Author: lukasavage
+ * @Date: 2022-07-25 09:02:17
+ * @LastEditors: lukasavage
+ * @LastEditTime: 2022-07-27 20:59:36
+ * @FilePath: \qiankun-study\singleSpaSoundCode\index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>构建微前端</title>
+</head>
+
+<body>
+    <script src="/lib/umd/single-spa.js"></script>
+    <script>
+        // 参数 1) 注册应用的名字
+        singleSpa.registerApplication('app1', async () => {
+            return {
+                bootstrap: async () => { }, // 启动状态
+                mount: async () => { },     // 挂载状态
+                unmount: async () => { },   // 卸载状态
+            }
+        },
+            location => location.hash.startsWith('#/app1'), // 激活规则
+            {
+                store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
+            }
+        )
+
+        singleSpa.start(); // 启动这个应用
+
+        // registerApplication 默认会加载应用
+        // start时会挂载应用
+    </script>
+</body>
+
+</html>

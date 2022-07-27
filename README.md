@@ -171,63 +171,95 @@ create-single-spa vue-app
 
 ## 六、qiankun源码解读
 
-## 七、模块联邦
+### 6.1 安装
 
-1. 需要安装的包
+```bash
+npm init -y
+npm i rollup rollup-plugin-serve -D
+```
 
-   ```bash
-   npm i create-single-spa -g
-   yarn add single-spa-vue    // 用于实现路由和应用加载，该包可以帮助我们导出单页面子应用
+### 6.3 基本配置
+
+1. 创建`rollup.config.js`,代码如下↓
+
+   ```js
+   import serve from 'rollup-plugin-serve'
+   
+   export default {
+       input: './src/single-spa.js',
+       output: {
+           file: './lib/umd/single-spa.js',
+           format: 'umd', // umd: 默认会把包挂载window上
+           name: 'singleSpa',
+           sourcemap: true
+       },
+       plugins: [
+           serve({
+               openPage: './index.html',
+               contentBase: '',
+               port: 3000
+           })
+       ]
+   }
    ```
 
-2. 具体用法
+2. 更改`package.json`
 
-   - vue-child：  src/main.js文件
+   ```json
+   "scripts": {
+       "dev": "rollup -c -w"
+   },
+   ```
 
-     ```js
-     import Vue from 'vue';
-     import App from './App.vue';
-     import singleSpaVue from 'single-spa-vue';
-     
-     Vue.config.productionTip = false;
-     
-     /* 
-     new Vue({
-     	render: h => h(App),
-     }).$mount('#app');
-      */
-     
-     const appOptions = {
-     	el: '#vue', // 挂载到父应用中的id为vue的标签中
-     	render: h => h(App),
-     };
-     
-     // note: ①、协议接入，定好了协议，父应用会调用这些方法
-     export const { bootstrap, mount, unmount } = singleSpaVue({
-     	Vue,
-     	appOptions,
-     });
-     
-     // note: ②、我们需要父应用加载子应用，将子应用打包成一个个的lib去给父应用使用
-     ```
+3. 根目录创建`index.html`
 
-   - vue-child    src/vue.config.js
+   ```html
+   <!--
+    * @Descripttion: 
+    * @Author: lukasavage
+    * @Date: 2022-07-25 09:02:17
+    * @LastEditors: lukasavage
+    * @LastEditTime: 2022-07-25 09:33:21
+    * @FilePath: \qiankun-study\singleSpaSoundCode\index.html
+   -->
+   <!DOCTYPE html>
+   <html lang="en">
+   
+   <head>
+       <meta charset="UTF-8">
+       <meta http-equiv="X-UA-Compatible" content="IE=edge">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>构建微前端</title>
+   </head>
+   
+   <body>
+       <script src="/lib/umd/single-spa.js"></script>
+       <script>
+           // 参数 1) 注册应用的名字
+           singleSpa.registerApplication('app1', async () => {
+               return {
+                   bootstrap: async () => { },
+                   mount: async () => { },
+                   unmount: async () => { },
+               }
+           },
+               location => location.hash.startsWith('#/app1'), // 激活规则
+               {
+                   store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
+               }
+           )
+   
+           singleSpa.start(); // 启动这个应用
+   
+           // registerApplication 默认会加载应用
+           // start时会挂载应用
+       </script>
+   </body>
+   </html>
+   ```
 
-     ```js
-     const { defineConfig } = require('@vue/cli-service');
-     module.exports = defineConfig({
-         configureWebpack: {
-             output: {
-                 library: 'singleVue',  // 打包类库的名字
-                 library: 'umd'         // 打包后的模块类型，umd:会把导出后的模块放入到window上
-             },
-             devServer: {
-                 port: 10000
-             }
-         },
-     	transpileDependencies: true,
-     });
-     
-     ```
+4. 
 
-   - vue-parent  
+5. 
+
+## 七、模块联邦

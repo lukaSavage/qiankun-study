@@ -1,0 +1,16 @@
+{
+  "name": "singlespasoundcode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "rollup -c -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rollup": "^2.77.0",
+    "rollup-plugin-serve": "^2.0.0"
+  }
+}
