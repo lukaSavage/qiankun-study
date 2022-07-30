@@ -5,45 +5,6 @@
 })(this, (function (exports) { 'use strict';
 
 	/*
-	 * @Descripttion:
-	 * @Author: lukasavage
-	 * @Date: 2022-07-25 09:39:41
-	 * @LastEditors: lukasavage
-	 * @LastEditTime: 2022-07-27 21:37:22
-	 * @FilePath: \qiankun-study\singleSpaSoundCode\src\start.js
-	 */
-
-	function start() {
-		// 需要挂载应用
-		reroute(); // 除了去加载应哟呵你给还需要去挂载应用
-	}
-
-	/*
-	 * @Descripttion:
-	 * @Author: lukasavage
-	 * @Date: 2022-07-27 21:34:06
-	 * @LastEditors: lukasavage
-	 * @LastEditTime: 2022-07-27 22:13:16
-	 * @FilePath: \qiankun-study\singleSpaSoundCode\src\navigations\reroute.js
-	 */
-
-	// 核心应用处理方法
-	function reroute() {
-		// 需要获取要加载的应用
-		// 需要获取要不给挂载的应用
-		// 哪些应用需要被卸载
-
-		getAppChange();
-
-		{
-			// 注册应用时 需要预先加载
-			return loadApps(); // 加载应用
-		}
-
-		async function loadApps() {}
-	}
-
-	/*
 	 * @Descripttion: 描述应用的整个状态
 	 * @Author: lukasavage
 	 * @Date: 2022-07-25 09:57:14
@@ -62,6 +23,79 @@
 	// 当前这个应用是否要被激活
 	function shouldBeActive(app) { // 如果返回true,那么应用应该就开始初始化等系列操作
 	    return app.activeWhen(window.location)
+	}
+
+	/*
+	 * @Descripttion:
+	 * @Author: lukasavage
+	 * @Date: 2022-07-30 10:32:45
+	 * @LastEditors: lukasavage
+	 * @LastEditTime: 2022-07-30 11:17:01
+	 * @FilePath: \qiankun-study\singleSpaSoundCode\src\lifecycles\load.js
+	 */
+
+	function flattenFnArray(fns) {
+		fns = Array.isArray(fns) ? fns : [fns];
+
+	    // 通过promise来链式调用
+		return props =>
+			fns.reduce((p, fn) => p.then(() => fn(props)), Promimse.resolve());
+	}
+
+	async function toLoadPromise(app) {
+		app.status = LOADING_SOURCE_CODE;
+
+		const { bootstrap, mount, unmount } = await app.loadApp(app.customProps);
+		app.status = NOT_BOOTSTRAPPED;
+
+		// tag: 注意:用户这里可能传的是一个数组，需要封装方法做特殊处理
+		app.bootstrap = flattenFnArray(bootstrap);
+		app.mount = mount;
+		app.unmount = unmount;
+		return app;
+	}
+
+	/*
+	 * @Descripttion:
+	 * @Author: lukasavage
+	 * @Date: 2022-07-25 09:39:41
+	 * @LastEditors: lukasavage
+	 * @LastEditTime: 2022-07-27 21:37:22
+	 * @FilePath: \qiankun-study\singleSpaSoundCode\src\start.js
+	 */
+
+	function start() {
+		// 需要挂载应用
+		reroute(); // 除了去加载应哟呵你给还需要去挂载应用
+	}
+
+	/*
+	 * @Descripttion:
+	 * @Author: lukasavage
+	 * @Date: 2022-07-27 21:34:06
+	 * @LastEditors: lukasavage
+	 * @LastEditTime: 2022-07-30 11:44:34
+	 * @FilePath: \qiankun-study\singleSpaSoundCode\src\navigations\reroute.js
+	 */
+
+	// 核心应用处理方法
+	function reroute() {
+		// 需要获取要加载的应用
+		// 需要获取要被挂载的应用
+		// 哪些应用需要被卸载
+
+		const { appsToLoad, appsToMount, appToUmmount } = getAppChange();
+
+		{
+			// 注册应用时 需要预先加载
+			return loadApps(); // 加载应用
+		}
+
+		async function loadApps() {
+			// 预加载应用
+			let apps = await Promise.all(appsToLoad.map(toLoadPromise)); // 就是获取到bootstrap, mount和unmount方法放到app上
+			console.log(apps);
+		}
 	}
 
 	/*

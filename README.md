@@ -165,7 +165,8 @@ create-single-spa vue-app
      </script>
    ```
 
-4.  
+
+
 
 ## 五、qiankun实战
 
