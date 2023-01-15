@@ -119,7 +119,7 @@ create-single-spa vue-app
 
 #### 3.2.1 启动vue
 
-1. 先改写vue.config.js
+1. 对于`vue`项目，先改写vue.config.js，之后通过命令`yarn serve`启动即可
 
    ```js
    const { defineConfig } = require('@vue/cli-service');
@@ -128,139 +128,110 @@ create-single-spa vue-app
    +	devServer: {
    +		port: 3000,
    +	},
+   +   configureWebpack: {
+   +       output: {
+   +         libraryTarget: 'system',
+   +       },
+   +    },
    });
    ```
 
-2. 接着在`singleSpa\base\src\lks-root-config.js`下注册子应用
+   <font color="#f00">注意：有且仅有`vue`应用需要添加`configureWebpack`选项，否则会报错！！！</font>
 
-   > 当访问 `/vue` 路径的时候，single-spa便会加载 `System.import('@lks/vue')`
+2. 对于react项目，需要更改`webpack.config.js`之后再通过命令`yarn start`启动即可。
 
    ```js
-   registerApplication({
-   	name: '@lks-vue', // 应用名字 随便起
-   	app: () => System.import('@lks/vue'), // 当路径匹配到的时候，执行这个方法
-   	activeWhen: ['/vue'],
-   });
+   module.exports = (webpackConfigEnv, argv) => {
+     ...
+     return merge(defaultConfig, {
+   +   output: {
+   +     libraryTarget: 'system'
+   +   },
+   + });
+   };
    ```
 
-3. 接着改写`singleSpa\base\src\index.ejs`下的代码
+   
 
-   > 此时`System.import('@lks/vue')`对应的imports为 `"@lks/vue":"//localhost:3000/js/app.js"`
+### 3.3 编辑基座
+
+1. 先编辑`index.ejs`文件，配置如下
 
    ```ejs
-   </script>
-       <link rel="preload" href="https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js" as="script">
-   
-       <!-- Add your organization's prod import map URL to this script's src  -->
-       <!-- <script type="systemjs-importmap" src="/importmap.json"></script> -->
-   
-       <% if (isLocal) { %>
-           <script type="systemjs-importmap">
+   <script type="systemjs-importmap">
        {
          "imports": {
-           "@lks/root-config": "//localhost:9000/lks-root-config.js",
-           "@lks/vue":"//localhost:3000/js/app.js"
+           "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
+   +       "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+   +       "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"
          }
-      }
+       }
      </script>
    ```
 
+   <font color="#f00">注意：上面的代码一定要加入`react`和`reac-dom`这两个cdn ，如果不加，在加载`react`子应用的时候，会出现如下错误</font>
 
+   ![react跑错](imgs/05、react子应用跑错.png)
 
+   接着我们再编辑下面的代码，增加两个路径地址↓
+
+   ```ejs
+   <% if (isLocal) { %>
+       <script type="systemjs-importmap">
+       {
+         "imports": {
+           "@single-spa/welcome": "https://unpkg.com/single-spa-welcome/dist/single-spa-welcome.js",
+           "@lks/root-config": "//localhost:9000/lks-root-config.js",
+   +       "@lks/vue": "//localhost:3000/js/app.js",
+   +       "@lks/react": "//localhost:8080/lks-react.js"
+         }
+       }
+     </script>
+   <% } %>
+   ```
+
+2. 编辑`microfrontend-layout.html`文件，增加地址导航，
+
+   ```ejs
+   <single-spa-router>
+     <!--
+   
+       This is the single-spa Layout Definition for your microfrontends.
+       See https://single-spa.js.org/docs/layout-definition/ for more information.
+   
+     -->
+   
+     <!-- Example layouts you might find helpful:
+   
+     <nav>
+       <application name="@org/navbar"></application>
+     </nav>
+     <route path="settings">
+       <application name="@org/settings"></application>
+     </route>
+   
+     -->
+   
+     <main>
+       <route default>
+         <application name="@single-spa/welcome"></application>
+       </route>
+   +   <route path="vue">
+   +     <application name="@lks/vue"></application>
+   +   </route>
+   +   <route path="react">
+   +     <application name="@lks/react"></application>
+   +   </route>
+     </main>
+   </single-spa-router>
+   ```
+
+   至此，一个基于single-spa的微前端应用就跑起来了~
+
+## 四、Single-spa源码解读
 
 ## 五、qiankun实战
 
 ## 六、qiankun源码解读
-
-### 6.1 安装
-
-```bash
-npm init -y
-npm i rollup rollup-plugin-serve -D
-```
-
-### 6.3 基本配置
-
-1. 创建`rollup.config.js`,代码如下↓
-
-   ```js
-   import serve from 'rollup-plugin-serve'
-   
-   export default {
-       input: './src/single-spa.js',
-       output: {
-           file: './lib/umd/single-spa.js',
-           format: 'umd', // umd: 默认会把包挂载window上
-           name: 'singleSpa',
-           sourcemap: true
-       },
-       plugins: [
-           serve({
-               openPage: './index.html',
-               contentBase: '',
-               port: 3000
-           })
-       ]
-   }
-   ```
-
-2. 更改`package.json`
-
-   ```json
-   "scripts": {
-       "dev": "rollup -c -w"
-   },
-   ```
-
-3. 根目录创建`index.html`
-
-   ```html
-   <!--
-    * @Descripttion: 
-    * @Author: lukasavage
-    * @Date: 2022-07-25 09:02:17
-    * @LastEditors: lukasavage
-    * @LastEditTime: 2022-07-25 09:33:21
-    * @FilePath: \qiankun-study\singleSpaSoundCode\index.html
-   -->
-   <!DOCTYPE html>
-   <html lang="en">
-   
-   <head>
-       <meta charset="UTF-8">
-       <meta http-equiv="X-UA-Compatible" content="IE=edge">
-       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-       <title>构建微前端</title>
-   </head>
-   
-   <body>
-       <script src="/lib/umd/single-spa.js"></script>
-       <script>
-           // 参数 1) 注册应用的名字
-           singleSpa.registerApplication('app1', async () => {
-               return {
-                   bootstrap: async () => { },
-                   mount: async () => { },
-                   unmount: async () => { },
-               }
-           },
-               location => location.hash.startsWith('#/app1'), // 激活规则
-               {
-                   store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
-               }
-           )
-   
-           singleSpa.start(); // 启动这个应用
-   
-           // registerApplication 默认会加载应用
-           // start时会挂载应用
-       </script>
-   </body>
-   </html>
-   ```
-
-4. 
-
-5. 
 
 ## 七、模块联邦

@@ -1,21 +1,20 @@
 /*
- * @Descripttion:
+ * @Descripttion: 
  * @Author: lukasavage
- * @Date: 2022-07-21 21:40:46
+ * @Date: 2023-01-15 14:16:54
  * @LastEditors: lukasavage
- * @LastEditTime: 2022-07-21 22:03:03
+ * @LastEditTime: 2023-01-15 14:56:15
  * @FilePath: \qiankun-study\singleSpa\vue-app\vue.config.js
  */
-const { defineConfig } = require('@vue/cli-service');
+const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
-	// transpileDependencies: true,
-	devServer: {
-		port: 3000,
-	},
-});
-
-// module.exports = {
-// 	devServe: {
-// 		port: 3000,
-// 	},
-// };
+  transpileDependencies: true,
+  devServer: {
+    port: 3000
+  },
+  configureWebpack: {
+    output: {
+      libraryTarget: 'system',
+    },
+  },
+})
