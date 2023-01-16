@@ -230,8 +230,114 @@ create-single-spa vue-app
 
 ## 四、Single-spa源码解读
 
+### 4.1核心流程解读
+
+首先，`single-spa`的两个核心API`registerApplication`和`start`方法，registerApplication方法主要负责app应用的收集，start
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>构建微前端</title>
+</head>
+
+<body>
+    <a href="#/a">a应用</a>
+    <a href="#/b">b应用</a>
+    <!-- <script src="/lib/umd/single-spa.js"></script> -->
+    <!-- 需要把包变成umd，其他的会报错 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/single-spa/5.9.4/umd/single-spa.dev.min.js"></script>
+    <script>
+        const { registerApplication, start } = singleSpa
+        // 参数 1) 注册应用的名字
+        const app1 = {
+            bootstrap: [async (props) => { // bootstrap的三个函数是同时执行的,并且只会在启动的时候执行一次，后面切回来不再执行
+                console.log('aaa项目启用了1~~~~');
+            }, async (props) => {
+                console.log('aaa项目启用了2~~~~');
+            }, async (props) => {
+                console.log('aaa项目启用了3~~~~');
+            }],
+            mount: async (props) => { console.log('app1挂载~'); },     // 挂载状态
+            unmount: async (props) => { console.log('app1已卸载'); },   // 卸载状态
+        }
+        const app2 = {
+            bootstrap: [async (props) => {
+                console.log('bbb项目启用了1~~~~');
+            }, async (props) => {
+                console.log('bbb项目启用了2~~~~');
+            }, async (props) => {
+                console.log('bbb项目启用了3~~~~');
+            }],
+            mount: async (props) => { console.log('app2挂载~'); },     // 挂载状态
+            unmount: async (props) => { console.log('app2已卸载'); },   // 卸载状态
+        }
+
+        registerApplication(
+            'app1',
+            async (props) => app1,
+            location => location.hash.startsWith('#/a'), // 激活规则
+            {
+                store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
+            }
+        )
+        registerApplication(
+            'app2',
+            async (props) => app2,
+            location => location.hash.startsWith('#/b'), // 激活规则
+            {
+                store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
+            }
+        )
+
+        start(); // 启动这个应用
+
+        // registerApplication 默认会加载应用
+        // start时会挂载应用
+    </script>
+</body>
+
+</html>
+```
+
+### 4.2 应用加载状态
+
+![加载状态流程图](imgs/06、加载状态流程图.png)
+
+TODO。。。
+
 ## 五、qiankun实战
+
+### 5.1 介绍
+
+> qiankun 是一个基于 [single-spa](https://github.com/CanopyTax/single-spa) 的[微前端](https://micro-frontends.org/)实现库，旨在帮助大家能更简单、无痛的构建一个生产可用微前端架构系统。
+
+qiankun的特性如下↓
+
+- 📦 **基于 [single-spa](https://github.com/CanopyTax/single-spa)** 封装，提供了更加开箱即用的 API。
+- 📱 **技术栈无关**，任意技术栈的应用均可 使用/接入，不论是 React/Vue/Angular/JQuery 还是其他等框架。
+- 💪 **HTML Entry 接入方式**，让你接入微应用像使用 iframe 一样简单。
+- 🛡 **样式隔离**，确保微应用之间样式互相不干扰。
+- 🧳 **JS 沙箱**，确保微应用之间 全局变量/事件 不冲突。
+- ⚡️ **资源预加载**，在浏览器空闲时间预加载未打开的微应用资源，加速微应用打开速度。
+- 🔌 **umi 插件**，提供了 [@umijs/plugin-qiankun](https://github.com/umijs/plugins/tree/master/packages/plugin-qiankun) 供 umi 应用一键切换成微前端架构系统。
+
+### 5.2 安装
+
+```bash
+ yarn add qiankun # 或者 npm i qiankun -S
+```
+
+TODO...
 
 ## 六、qiankun源码解读
 
+TODO...
+
 ## 七、模块联邦
+
+TODO...

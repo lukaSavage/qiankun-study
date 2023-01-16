@@ -17,29 +17,55 @@
 </head>
 
 <body>
-    <script src="/lib/umd/single-spa.js"></script>
+    <a href="#/a">a应用</a>
+    <a href="#/b">b应用</a>
+    <!-- <script src="/lib/umd/single-spa.js"></script> -->
+    <!-- 需要把包变成umd，其他的会报错 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/single-spa/5.9.4/umd/single-spa.dev.min.js"></script>
     <script>
+        const { registerApplication, start } = singleSpa
         // 参数 1) 注册应用的名字
-        singleSpa.registerApplication('app1', async (props) => {
-            return {
-                bootstrap: [async (props) => {
-                    console.log('项目启用了1~~~~');
-                }, async (props) => {
-                    console.log('项目启用了2~~~~');
-                }, async (props) => {
-                    console.log('项目启用了3~~~~');
-                }], // 启动状态
-                mount: async (props) => { },     // 挂载状态
-                unmount: async (props) => { },   // 卸载状态
+        const app1 = {
+            bootstrap: [async (props) => { // bootstrap的三个函数是同时执行的,并且只会在启动的时候执行一次，后面切回来不再执行
+                console.log('aaa项目启用了1~~~~');
+            }, async (props) => {
+                console.log('aaa项目启用了2~~~~');
+            }, async (props) => {
+                console.log('aaa项目启用了3~~~~');
+            }],
+            mount: async (props) => { console.log('app1挂载~'); },     // 挂载状态
+            unmount: async (props) => { console.log('app1已卸载'); },   // 卸载状态
+        }
+        const app2 = {
+            bootstrap: [async (props) => {
+                console.log('bbb项目启用了1~~~~');
+            }, async (props) => {
+                console.log('bbb项目启用了2~~~~');
+            }, async (props) => {
+                console.log('bbb项目启用了3~~~~');
+            }],
+            mount: async (props) => { console.log('app2挂载~'); },     // 挂载状态
+            unmount: async (props) => { console.log('app2已卸载'); },   // 卸载状态
+        }
+
+        registerApplication(
+            'app1',
+            async (props) => app1,
+            location => location.hash.startsWith('#/a'), // 激活规则
+            {
+                store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
             }
-        },
-            location => location.hash.startsWith('#/app1'), // 激活规则
+        )
+        registerApplication(
+            'app2',
+            async (props) => app2,
+            location => location.hash.startsWith('#/b'), // 激活规则
             {
                 store: { name: '张三', age: 18 } // 注册应用的时候可以传递参数
             }
         )
 
-        singleSpa.start(); // 启动这个应用
+        start(); // 启动这个应用
 
         // registerApplication 默认会加载应用
         // start时会挂载应用

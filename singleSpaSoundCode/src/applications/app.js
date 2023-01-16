@@ -22,8 +22,8 @@ import {
 /**
  *
  * @param {*} appName 应用名字
- * @param {*} loadApp 加载的应用
- * @param {*} activeWhen 当激活时会调用 loadApp
+ * @param {*} loadApp 加载的app，(一个对象，对象里面包含bootstrap、mount和unmount三个方法)
+ * @param {*} activeWhen 什么时候加载
  * @param {*} customProps 自定义属性
  */
 const apps = []; // 用来存放所有的应用
@@ -35,9 +35,14 @@ export function registerApplication(appName, loadApp, activeWhen, customProps) {
 		loadApp,
 		activeWhen,
 		customProps,
-		status: NOT_LOADED,
+		status: NOT_LOADED, // 一开始给每个app加载一个状态
 	});
-	reroute(); // 加载应用
+    // 收集应用后，需要进行应用的加载(single-spa的核心函数)
+	reroute(); // 重写路径，后续切换路由，要再次做这些事
+}
+
+export function start() {
+
 }
 
 export function getAppChange() {

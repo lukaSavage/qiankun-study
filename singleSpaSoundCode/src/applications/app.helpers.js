@@ -20,12 +20,12 @@ export const UNLOADING = 'UNLOADING'; // 完全卸载中
 export const LOAD_ERR = 'LOAD_ERR'; // 完全卸载中
 export const SKIP_BECAUSE_BROKEN = 'SKIP_BECAUSE_BROKEN';
 
-// 当前应用是否被激活
+// 当前应用是否被挂载
 export function isActive(app) {
 	return app.status === MOUNTED;
 }
 
-// 当前这个应用是否要被激活
+// 路径匹配到加载应用
 export function shouldBeActive(app) { // 如果返回true,那么应用应该就开始初始化等系列操作
     return app.activeWhen(window.location)
 }
