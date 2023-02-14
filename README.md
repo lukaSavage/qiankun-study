@@ -336,8 +336,21 @@ TODO...
 
 ## 六、qiankun源码解读
 
-TODO...
+## 七、CSS隔离方案
 
-## 七、模块联邦
+> 首先什么是css隔离？
 
-TODO...
+**CSS隔离是将CSS样式通过特殊方法安置在独立环境中，暂时避免和其他CSS污染。**
+
+### 7.1 子应用之间的样式隔离
+
+`Dynamic Stylesheet`动态样式表，当应用切换时移除老应用样式，添加新应用样式。
+
+### 7.2 主应用和子应用之间的样式隔离
+
+通常有4中解决方案，都能更好的实现css隔离的需求。
+
+- `BEM`(Block Element Modifier)约定项目前缀
+- `CSS-Modules`打包时生成不冲突的选择器名
+- `Shadow DOM`真正意义上的隔离
+- `css-in-js` 使用 JS 语言写 CSS,facebook剔除
